@@ -1,0 +1,54 @@
+option optimize_for = LITE_RUNTIME;
+option java_package = "com.janlr.ag.cellwar.common.fixed.proto";
+option java_outer_classname = "LoginProto";
+/*
+ * 游戏TCP前后端通信包头信息
+ *
+ * 客户端发给服务端的信息
+ *
+ * Length  包长度, 4个字节
+ * Protocol  协议号, 4个字节
+ * SequenceNO  包流水号, 测试可以随便设值, 2个字节
+ * Content  包内容, protobuf字节流
+ *
+ * +----------+----------+----------------+----------------+
+ * |  Length  | Protocol |   SequenceNO   |    Content     |
+ * |   100    |   1001   |      123       |    protobuf    |
+ * +----------+----------+----------------+----------------+
+ *
+ *
+ * 服务端推送给客户端的信息
+ * Length  包长度, 4个字节
+ * Protocol  协议号, 4个字节
+ * ServerSequenceNO  服务端流水号, 2个字节
+ * ClientSequenceNO  客户端流水号, 2个字节
+ * Result  处理结果, 0:成功 1:失败 1个字节
+ * Content  包内容, protobuf字节流
+ *
+ * +--------+----------+------------------+------------------+--------+-----------+
+ * | Length | Protocol | ServerSequenceNO | ClientSequenceNO | Result |  Content  |
+ * |   100  |   1001   |       123        |       123        |    0   |  protobuf |
+ * +--------+----------+------------------+------------------+--------+-----------+
+  */
+
+// AUTH_LOGIN_CHECK = 1001;// 登录检查
+message C2SLogin {
+    optional string account = 1; // 用户账号(userId)
+    optional string connectKey = 2; // 网关连接秘钥
+	}
+
+// AUTH_LOGIN_CHECK = 1001;// 登录返回
+message S2CLogin {
+    optional string account = 1; // 用户账号(userId)
+    optional string result = 2; // 登陆结果 
+	}
+	
+// GT_PLAYER_HEARTBEAT = 1002;// 心跳
+message C2SHeart {
+    optional string account = 1; // 用户账号(userId)
+	}
+	
+// GT_PLAYER_HEARTBEAT = 1002;// 心跳返回
+message S2CHeart {
+    optional string account = 1; // 用户账号(userId)
+	}

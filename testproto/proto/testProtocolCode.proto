@@ -1,0 +1,17 @@
+option optimize_for = LITE_RUNTIME;
+option java_package = "com.janlr.ag.cellwar.common.fixed.proto";
+option java_outer_classname = "ProtocolCode";
+
+//1000 - 99999
+enum Game {
+
+
+    // ---------------------- 网关登录 ------------------------
+    AUTH_LOGIN_CHECK = 1001;// 登录检查
+
+
+    GT_PLAYER_HEARTBEAT = 1002;// 心跳
+
+
+}
+
