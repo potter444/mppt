@@ -17,10 +17,10 @@ class GameSocket:
         self._client.setblocking(blocking)
         return self._client.connect_ex(self.getaddr())
 
-    def send_data(self, data):
+    def send(self, data):
         return self._client.send(data)
 
-    def receive_data(self, length):
+    def recv(self, length):
         return self._client.recv(length)
 
     def close(self):

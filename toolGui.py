@@ -3,8 +3,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import os
 import config
+from socketclient import GameSocket
 
 QT_APP = QtWidgets.QApplication(sys.argv)
+protoData = {}
 
 
 class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
@@ -29,18 +31,30 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
         self.quitbutton.clicked.connect(self.relogin)
         self.pushButton.clicked.connect(self.send_proto)
 
+
     def get_server(self, game):  # 根据游戏选择服务器地址
+        global protoData
+        protoData = config.gameDict.get(game).get("getProtoMethod")()
+
         self.severselect.clear()
         self.severselect.addItems(list(config.gameDict.get(game).get("gameServer")))
 
     def login_game(self):  # 登陆按钮回调函数，执行登陆逻辑
+
         self.game = self.gameselect.currentText()
-        sever = self.severselect.currentIndex()
+        sever = self.severselect.currentText()
+        sever = (sever.split(":")[0], int(sever.split(":")[1]))
+        account = self.account.text()
+        protoData.get("C2SLogin").get("args")["account"] = account
+
+        sock = GameSocket(sever)
+        sock.connect()
+        config.gameDict.get(self.game).get("sendMethod")(sock, "C2SLogin")
 
         self.loginframe.setVisible(False)
         self.protoframe.setVisible(True)
-        self.c2sproto = config.gameDict.get(self.game).get("C2SprotoDict")()
-        self.proto_name.addItems(list(self.c2sproto.keys()))
+
+        self.proto_name.addItems(list(protoData.keys()))
         self.proto_name.activated[str].connect(self.select_proto)
         filepath = os.listdir(config.gameDict.get(self.game).get("filepath"))
         self.protofileBox.addItems(filepath)
@@ -65,7 +79,7 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
     # 选择协议时，调用的方法。自动生成参数列表
     def select_proto(self, proto):
         self.argvlist.clear()
-        self.argvlist = self.c2sproto.get(proto)
+        self.argvlist = protoData.get(proto).get("args")
 
         # 先清空form layout
         for i in range(self.argsformLayout.count()):
@@ -76,7 +90,7 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
         print(self.argvlist)
 
         # 遍历参数列表，生成QLineEdit
-        for i in self.argvlist:
+        for i in self.argvlist.keys():
             value_1 = QtWidgets.QLineEdit()
 
             self.argsformLayout.addRow("%s:" % i, value_1)

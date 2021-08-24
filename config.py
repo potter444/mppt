@@ -18,8 +18,10 @@ gameDict = {"game1": {"gameMethod": Game1Proto,
             "TestGame": {"gameMethod": Game2Proto,
                          "gameServer": [socket.gethostbyname(socket.gethostname()) + ":21566", "2", "33333"],
                          "filepath": "testproto/proto",
-                         "C2SprotoDict": get_testc2s_protobuf,
+                         "C2SprotoDict": protoData,
                          "S2CProtoDict": get_tests2c_protobuf,
+                         "getProtoMethod": get_testgame_protobuf,
+                         "sendMethod": testgame_send
                          }
             }
 
