@@ -357,8 +357,23 @@
      <height>23</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuhelp">
+    <property name="title">
+     <string>help</string>
+    </property>
+    <addaction name="actionstart_testgame_server"/>
+   </widget>
+   <addaction name="menuhelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionstart_testgame_server">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>start testgame server</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

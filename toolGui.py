@@ -4,9 +4,22 @@ import sys
 import os
 import config
 from socketclient import GameSocket
+import selectors
+from concurrent.futures.thread import ThreadPoolExecutor
+
 
 QT_APP = QtWidgets.QApplication(sys.argv)
 protoData = {}
+_selector = selectors.DefaultSelector()
+_threadExecutors = []
+_networkExecutor = ThreadPoolExecutor(1, 'boss-t')
+
+
+def init_executor():
+    for i in range(2):
+        executor = ThreadPoolExecutor(1, 'worker-' + str(i))
+        _threadExecutors.append(executor)
+
 
 
 class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
@@ -30,7 +43,8 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
         self.loginButton.clicked.connect(self.login_game)
         self.quitbutton.clicked.connect(self.relogin)
         self.pushButton.clicked.connect(self.send_proto)
-
+        self.actionstart_testgame_server.triggered.connect(self.start_testgame_server)
+        self.sock = GameSocket()
 
     def get_server(self, game):  # 根据游戏选择服务器地址
         global protoData
@@ -47,9 +61,8 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
         account = self.account.text()
         protoData.get("C2SLogin").get("args")["account"] = account
 
-        sock = GameSocket(sever)
-        sock.connect()
-        config.gameDict.get(self.game).get("sendMethod")(sock, "C2SLogin")
+        self.sock.connect(sever)
+        config.gameDict.get(self.game).get("sendMethod")(self.sock, "C2SLogin")
 
         self.loginframe.setVisible(False)
         self.protoframe.setVisible(True)
@@ -106,9 +119,26 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
 
         print("发送的协议和参数：", protoId, argv_value)
 
+
+
     # 把回包解析，输出在界面上
     def show_result(self, data):
         pass
+
+    # 启动testgame服务器
+    def start_testgame_server(self):
+        import threading
+        p = threading.Thread(target=self.start_process)
+        p.start()
+
+
+    def start_process(self):
+        from testserver import SocketServer
+        socket_sever = SocketServer()
+        socket_sever.start()
+        # _networkExecutor.submit(socket_sever.start())
+
+        # _selector.register()
 
 
 if __name__ == "__main__":
