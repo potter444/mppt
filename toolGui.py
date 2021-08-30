@@ -62,7 +62,7 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
         protoData.get("C2SLogin").get("args")["account"] = account
 
         self.sock.connect(sever)
-        config.gameDict.get(self.game).get("sendMethod")(self.sock, "C2SLogin")
+        config.gameDict.get(self.game).get("sendMethod")(self.sock, "C2SLogin")  # 发送登陆请求
 
         self.loginframe.setVisible(False)
         self.protoframe.setVisible(True)
@@ -111,15 +111,16 @@ class ToolsWindows(Ui_MainWindow, QtWidgets.QMainWindow):
 
     # 发送协议，获取填写的proto,argv;并将结果输出到文本框
     def send_proto(self):
-        argv_value = []
-        protoId = self.proto_name.currentText()
+
+        protoid = self.proto_name.currentText()
         for i in range(self.argsformLayout.count()):
             if self.argsformLayout.itemAt(i).widget().inherits('QLineEdit'):
-                argv_value.append(self.argsformLayout.itemAt(i).widget().text())
+                key = self.argsformLayout.labelForField(self.argsformLayout.itemAt(i).widget()).text()[0:-1]
+                value = self.argsformLayout.itemAt(i).widget().text()
+                protoData.get(protoid).get("args")[key] = value
 
-        print("发送的协议和参数：", protoId, argv_value)
-
-
+        print("发送的协议和参数：", protoid, protoData)
+        config.gameDict.get(self.game).get("sendMethod")(self.sock, protoid)
 
     # 把回包解析，输出在界面上
     def show_result(self, data):

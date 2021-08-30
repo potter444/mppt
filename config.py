@@ -21,7 +21,8 @@ gameDict = {"game1": {"gameMethod": Game1Proto,
                          "C2SprotoDict": protoData,
                          "S2CProtoDict": get_tests2c_protobuf,
                          "getProtoMethod": get_testgame_protobuf,
-                         "sendMethod": testgame_send
+                         "sendMethod": testgame_send,
+                         "recvMethod": testgame_recv
                          }
             }
 
